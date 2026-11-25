@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="ja" class=""><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwMDQ2OTA4MDQ5NzA2NDc4ODE0NiIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzRkOWMwNjhkMjhlOTRjZDBfaXBhZF9vZmZsaW5lX2FpLmh0bWwtMTMwIn0sImV4cCI6MTc5NTU4NTI4OSwiaWF0IjoxNzk1NTgxNjg5LCJhbGciOiJSUzI1NiJ9.ngR4geLowZ9B7lu3kIEhpU9BbfwsUqJnb6quxq_Siq6iFNBMAFwND1HfUtfs9agX1ZdLjg9xViSnfnVeqEnLmYgSNrSAMW3C4Wn735gor-4DSlEAGlx4tSEjbycHATDCHf41PbqtIHo9WBZZ6qCjLrAJkKx9tulmCS9sFhGwbgr_YsVvAafS1W9Yvvgcj0DTmuFunXJTAub15P0RCR8EJOiZFnRW0TeKYzqUTKkqT-Jbr1c1wL4RUqI6fFVSyCWnB3bn1XpaHuFS-6fGQblXb2vtN-C1CoZX1N5rnLIxj0N4B4i2vj4JWtsoeCXvyMVHf2qZGJ5HkmEPjJIar2HKPA","c_4d9c068d28e94cd0_ipad_offline_ai.html-130")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Offline AI">
+  <meta name="theme-color" content="#0f172a">
+  <title>iPadオフラインAI Studio — クラッシュ防止設計ローカルLLM</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans JP"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts: Inter & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .safe-pt { padding-top: max(0.75rem, var(--sat)); }
+    .safe-pb { padding-bottom: max(0.75rem, var(--sab)); }
+    .safe-pl { padding-left: max(0.75rem, var(--sal)); }
+    .safe-pr { padding-right: max(0.75rem, var(--sar)); }
+
+    button, label, .no-select {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.55);
+    }
+
+    @keyframes blinkCursor {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .streaming-cursor::after {
+      content: "▋";
+      display: inline-block;
+      margin-left: 2px;
+      color: #818cf8;
+      animation: blinkCursor 0.9s infinite;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:"Inter", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border-width:0}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}.fixed{position:fixed}.relative{position:relative}.inset-0{inset:0px}.inset-y-0{top:0px;bottom:0px}.bottom-20{bottom:5rem}.left-0{left:0px}.left-1\/2{left:50%}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.mx-3{margin-left:0.75rem;margin-right:0.75rem}.mx-auto{margin-left:auto;margin-right:auto}.my-4{margin-top:1rem;margin-bottom:1rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-3{margin-top:0.75rem}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-2{height:0.5rem}.h-2\.5{height:0.625rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-9{height:2.25rem}.h-full{height:100%}.max-h-\[140px\]{max-height:140px}.max-h-\[88dvh\]{max-height:88dvh}.min-h-0{min-height:0px}.min-h-\[34px\]{min-height:34px}.min-h-\[36px\]{min-height:36px}.min-h-\[38px\]{min-height:38px}.min-h-\[40px\]{min-height:40px}.min-h-\[42px\]{min-height:42px}.min-h-\[44px\]{min-height:44px}.min-h-\[46px\]{min-height:46px}.w-10{width:2.5rem}.w-11{width:2.75rem}.w-2{width:0.5rem}.w-2\.5{width:0.625rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-9{width:2.25rem}.w-\[88vw\]{width:88vw}.w-\[92vw\]{width:92vw}.w-full{width:100%}.min-w-0{min-width:0px}.min-w-\[40px\]{min-width:40px}.min-w-\[44px\]{min-width:44px}.min-w-\[46px\]{min-width:46px}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-\[390px\]{max-width:390px}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-x-full{--tw-translate-x:-100%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-2{--tw-translate-y:0.5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes ping{75%, 100%{transform:scale(2);opacity:0}}.animate-ping{animation:ping 1s cubic-bezier(0, 0, 0.2, 1) infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.select-all{-webkit-user-select:all;user-select:all}.resize-none{resize:none}.appearance-none{-webkit-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.space-y-0\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.125rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.125rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-3\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.875rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.875rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-emerald-500\/25{border-color:rgb(16 185 129 / 0.25)}.border-indigo-500\/20{border-color:rgb(99 102 241 / 0.2)}.border-indigo-500\/30{border-color:rgb(99 102 241 / 0.3)}.border-rose-500\/25{border-color:rgb(244 63 94 / 0.25)}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-200\/70{border-color:rgb(226 232 240 / 0.7)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-amber-500\/25{border-color:rgb(245 158 11 / 0.25)}.border-indigo-500\/25{border-color:rgb(99 102 241 / 0.25)}.border-sky-500\/25{border-color:rgb(14 165 233 / 0.25)}.border-slate-200\/90{border-color:rgb(226 232 240 / 0.9)}.border-emerald-500{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-amber-600{--tw-bg-opacity:1;background-color:rgb(217 119 6 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-indigo-500{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.bg-indigo-500\/10{background-color:rgb(99 102 241 / 0.1)}.bg-indigo-500\/15{background-color:rgb(99 102 241 / 0.15)}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-rose-500{--tw-bg-opacity:1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}.bg-rose-500\/10{background-color:rgb(244 63 94 / 0.1)}.bg-rose-600{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-200\/80{background-color:rgb(226 232 240 / 0.8)}.bg-slate-300{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-950\/60{background-color:rgb(2 6 23 / 0.6)}.bg-slate-950\/75{background-color:rgb(2 6 23 / 0.75)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/70{background-color:rgb(255 255 255 / 0.7)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-emerald-500\/15{background-color:rgb(16 185 129 / 0.15)}.bg-sky-500\/15{background-color:rgb(14 165 233 / 0.15)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-violet-500{--tw-gradient-to:#8b5cf6 var(--tw-gradient-to-position)}.to-violet-600{--tw-gradient-to:#7c3aed var(--tw-gradient-to-position)}.p-1{padding:0.25rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-2{padding-bottom:0.5rem}.pt-1{padding-top:0.25rem}.pt-2{padding-top:0.5rem}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}.font-sans{font-family:"Inter", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-snug{line-height:1.375}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-indigo-500{--tw-text-opacity:1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-violet-500{--tw-text-opacity:1;color:rgb(139 92 246 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-sky-600{--tw-text-opacity:1;color:rgb(2 132 199 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.placeholder-slate-400::placeholder{--tw-placeholder-opacity:1;color:rgb(148 163 184 / var(--tw-placeholder-opacity, 1))}.accent-indigo-600{accent-color:#4f46e5}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-indigo-500\/20{--tw-shadow-color:rgb(99 102 241 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-indigo-600\/20{--tw-shadow-color:rgb(79 70 229 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-150{transition-duration:150ms}.duration-200{transition-duration:200ms}.duration-300{transition-duration:300ms}.ease-out{transition-timing-function:cubic-bezier(0, 0, 0.2, 1)}.after\:absolute::after{content:var(--tw-content);position:absolute}.after\:left-\[2px\]::after{content:var(--tw-content);left:2px}.after\:top-\[2px\]::after{content:var(--tw-content);top:2px}.after\:h-5::after{content:var(--tw-content);height:1.25rem}.after\:w-5::after{content:var(--tw-content);width:1.25rem}.after\:rounded-full::after{content:var(--tw-content);border-radius:9999px}.after\:border::after{content:var(--tw-content);border-width:1px}.after\:border-slate-300::after{content:var(--tw-content);--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.after\:bg-white::after{content:var(--tw-content);--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.after\:transition-all::after{content:var(--tw-content);transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.after\:content-\[\'\'\]::after{--tw-content:'';content:var(--tw-content)}.hover\:border-indigo-400\/50:hover{border-color:rgb(129 140 248 / 0.5)}.hover\:bg-amber-500:hover{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-500:hover{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-500\/15:hover{background-color:rgb(99 102 241 / 0.15)}.hover\:bg-rose-500:hover{--tw-bg-opacity:1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-500\/20:hover{background-color:rgb(244 63 94 / 0.2)}.hover\:bg-rose-600:hover{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:text-indigo-400:hover{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.hover\:text-indigo-500:hover{--tw-text-opacity:1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.disabled\:pointer-events-none:disabled{pointer-events:none}.disabled\:bg-slate-300:disabled{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.disabled\:text-slate-500:disabled{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.disabled\:opacity-40:disabled{opacity:0.4}.peer:checked ~ .peer-checked\:bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.peer:checked ~ .peer-checked\:after\:translate-x-full::after{content:var(--tw-content);--tw-translate-x:100%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.peer:checked ~ .peer-checked\:after\:border-white::after{content:var(--tw-content);--tw-border-opacity:1;border-color:rgb(255 255 255 / var(--tw-border-opacity, 1))}.peer:focus ~ .peer-focus\:outline-none{outline:2px solid transparent;outline-offset:2px}.dark\:block:is(.dark *){display:block}.dark\:hidden:is(.dark *){display:none}.dark\:border-slate-700:is(.dark *){--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.dark\:border-slate-700\/70:is(.dark *){border-color:rgb(51 65 85 / 0.7)}.dark\:border-slate-700\/80:is(.dark *){border-color:rgb(51 65 85 / 0.8)}.dark\:border-slate-800:is(.dark *){--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.dark\:border-slate-800\/80:is(.dark *){border-color:rgb(30 41 59 / 0.8)}.dark\:bg-slate-700:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/60:is(.dark *){background-color:rgb(30 41 59 / 0.6)}.dark\:bg-slate-800\/75:is(.dark *){background-color:rgb(30 41 59 / 0.75)}.dark\:bg-slate-800\/80:is(.dark *){background-color:rgb(30 41 59 / 0.8)}.dark\:bg-slate-800\/90:is(.dark *){background-color:rgb(30 41 59 / 0.9)}.dark\:bg-slate-900:is(.dark *){--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-900\/70:is(.dark *){background-color:rgb(15 23 42 / 0.7)}.dark\:bg-slate-900\/90:is(.dark *){background-color:rgb(15 23 42 / 0.9)}.dark\:bg-slate-950:is(.dark *){--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/50:is(.dark *){background-color:rgb(30 41 59 / 0.5)}.dark\:text-amber-300:is(.dark *){--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.dark\:text-emerald-400:is(.dark *){--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.dark\:text-indigo-300:is(.dark *){--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.dark\:text-rose-400:is(.dark *){--tw-text-opacity:1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}.dark\:text-slate-100:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:text-slate-200:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:text-slate-300:is(.dark *){--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.dark\:text-slate-400:is(.dark *){--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.dark\:text-white:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.dark\:text-emerald-300:is(.dark *){--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.dark\:text-sky-300:is(.dark *){--tw-text-opacity:1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}.dark\:hover\:bg-slate-700:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-slate-800:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:hover\:text-slate-200:hover:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:disabled\:bg-slate-800:disabled:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}@media (min-width: 640px){.sm\:my-8{margin-top:2rem;margin-bottom:2rem}.sm\:inline{display:inline}.sm\:inline-flex{display:inline-flex}.sm\:hidden{display:none}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:gap-2{gap:0.5rem}.sm\:p-5{padding:1.25rem}.sm\:p-6{padding:1.5rem}.sm\:px-3{padding-left:0.75rem;padding-right:0.75rem}.sm\:px-5{padding-left:1.25rem;padding-right:1.25rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}}@media (min-width: 768px){.md\:static{position:static}.md\:hidden{display:none}.md\:w-\[370px\]{width:370px}.md\:translate-x-0{--tw-translate-x:0px;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}}@media (min-width: 1024px){.lg\:inline{display:inline}.lg\:w-\[400px\]{width:400px}}@media (min-width: 1280px){.xl\:inline{display:inline}}</style></head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased flex flex-col">
+
+  <!-- トップヘッダーバー -->
+  <header class="safe-pt safe-pl safe-pr shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 z-30">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <button id="btnToggleSidebar" type="button" aria-label="モデル管理メニューを開く" class="md:hidden min-w-[44px] min-h-[44px] rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 transition active:scale-95">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10"></path>
+        </svg>
+      </button>
+
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"></path>
+        </svg>
+      </div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <h1 class="font-bold text-sm sm:text-base tracking-tight truncate">iPadオフラインAI Studio</h1>
+          <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+            v4安定エンジン
+          </span>
+        </div>
+        <p id="activeModelSubtitle" class="text-xs text-slate-500 dark:text-slate-400 truncate">
+          モデル未読込（左メニューから選択またはURL入力）
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div id="networkBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+        <span id="networkDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="networkText" class="hidden sm:inline">オンライン (モデルDL可能)</span>
+        <span id="networkTextShort" class="sm:hidden">オンライン</span>
+      </div>
+
+      <button id="btnUnloadModel" type="button" disabled="" title="モデルをアンロードしてiPadのメモリを即座に解放します" class="min-h-[40px] px-2.5 sm:px-3 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/25 hover:bg-rose-500/20 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5 transition active:scale-95">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        <span class="hidden lg:inline">メモリ解放</span>
+      </button>
+
+      <button id="btnOpenGuide" type="button" title="iPadホーム画面への追加・落ちないコツ" class="min-w-[40px] min-h-[40px] px-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition active:scale-95">
+        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="hidden xl:inline">iPadガイド</span>
+      </button>
+
+      <button id="btnExportHtml" type="button" title="このアプリを単体HTMLファイルとして保存" class="min-w-[40px] min-h-[40px] px-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition active:scale-95">
+        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
+        <span class="hidden xl:inline">HTMLファイルを保存</span>
+      </button>
+
+      <button id="btnThemeToggle" type="button" aria-label="テーマ切替" class="min-w-[40px] min-h-[40px] rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 transition active:scale-95">
+        <svg id="iconSun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <svg id="iconMoon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- メイン2カラムレイアウト -->
+  <div class="flex-1 min-h-0 flex relative overflow-hidden">
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-30 hidden md:hidden transition-opacity"></div>
+
+    <aside id="sidebarDrawer" class="fixed md:static inset-y-0 left-0 z-40 w-[88vw] max-w-[390px] md:w-[370px] lg:w-[400px] shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-out safe-pl">
+
+      <div class="p-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 shrink-0">
+        <div class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 w-full">
+          <button id="tabModels" type="button" class="min-h-[38px] rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs transition">
+            モデル取得・管理
+          </button>
+          <button id="tabSettings" type="button" class="min-h-[38px] rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition">
+            メモリ保護・推論設定
+          </button>
+        </div>
+        <button id="btnCloseSidebar" type="button" aria-label="閉じる" class="md:hidden min-w-[40px] min-h-[40px] rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ダウンロード進捗カード -->
+      <div id="downloadProgressCard" class="hidden mx-3 mt-3 p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 shrink-0">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="min-w-0">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+              <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+              <span id="progressPhaseLabel">モデルをダウンロード中...</span>
+            </span>
+            <p id="progressModelName" class="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate mt-0.5">-</p>
+          </div>
+          <button id="btnCancelDownload" type="button" class="shrink-0 min-h-[34px] px-2.5 rounded-lg text-xs font-semibold bg-rose-500 text-white hover:bg-rose-600 transition active:scale-95">
+            中止
+          </button>
+        </div>
+        <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mb-1.5">
+          <div id="progressBarFill" class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-150" style="width: 0%"></div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-600 dark:text-slate-300">
+          <span id="progressBytesText">0.0 MB / 計算中...</span>
+          <span id="progressPercentText">0%</span>
+        </div>
+      </div>
+
+      <!-- パネル1: モデル取得・キャッシュ管理 -->
+      <div id="panelModels" class="flex-1 overflow-y-auto p-3.5 space-y-5 safe-pb">
+        <section class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+              </svg>
+              ネットから自由URLダウンロード (.gguf)
+            </h2>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium">
+              自動ストリーミング
+            </span>
+          </div>
+          <p class="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+            Hugging Face等のGGUFリンクを貼り付けて直接ブラウザへ取り込みます。
+          </p>
+          <div class="space-y-2">
+            <input id="customUrlInput" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://huggingface.co/.../model-q4_k_m.gguf" class="w-full min-h-[44px] px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100 placeholder-slate-400">
+            <div class="flex gap-2">
+              <button id="btnDownloadCustomUrl" type="button" class="flex-1 min-h-[44px] px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-600/20 flex items-center justify-center gap-1.5 transition active:scale-98">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                DLして読込
+              </button>
+              <label for="localFileInput" class="min-h-[44px] px-3 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 cursor-pointer transition active:scale-98" title="iPadの「ファイル」アプリからローカルGGUFを選択">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+                <span>ファイル選択</span>
+              </label>
+              <input id="localFileInput" type="file" accept=".gguf" class="hidden">
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              iPad安全推奨プリセット (1GB未満)
+            </h2>
+            <span class="text-[10px] text-slate-400">ワンタップDL</span>
+          </div>
+          <div id="presetList" class="space-y-2"><div class="p-3 rounded-2xl border transition bg-white dark:bg-slate-800/50 border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate">Qwen2.5-1.5B-Instruct</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Q4_K_M · 約986MB</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/25">
+                  日本語トップクラスの賢さ
+                </span>
+                
+              </div>
+            </div>
+            <button type="button" class="shrink-0 min-h-[38px] px-3 rounded-xl text-xs font-semibold transition active:scale-95 bg-indigo-600 hover:bg-indigo-500 text-white">
+              DL＆起動
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">1GBギリギリですが、日本語の理解力・文章作成能力が頭一つ抜けて高い推奨モデル。</p>
+        </div><div class="p-3 rounded-2xl border transition bg-white dark:bg-slate-800/50 border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate">Qwen2.5-0.5B-Instruct</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Q4_K_M · 約400MB</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/25">
+                  超軽量・安定動作
+                </span>
+                
+              </div>
+            </div>
+            <button type="button" class="shrink-0 min-h-[38px] px-3 rounded-xl text-xs font-semibold transition active:scale-95 bg-indigo-600 hover:bg-indigo-500 text-white">
+              DL＆起動
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">無印iPadでも絶対に落ちない超軽量モデル。気軽な会話や要約に最適。</p>
+        </div><div class="p-3 rounded-2xl border transition bg-white dark:bg-slate-800/50 border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate">Llama-3.2-1B-Instruct</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Q4_K_M · 約808MB</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-500/25">
+                  Meta製バランス1B
+                </span>
+                
+              </div>
+            </div>
+            <button type="button" class="shrink-0 min-h-[38px] px-3 rounded-xl text-xs font-semibold transition active:scale-95 bg-indigo-600 hover:bg-indigo-500 text-white">
+              DL＆起動
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Meta製の安定した1Bモデル。構造化された返答が得意。</p>
+        </div><div class="p-3 rounded-2xl border transition bg-white dark:bg-slate-800/50 border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400/50">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate">SmolLM2-360M-Instruct</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Q8_0 · 約386MB</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-sky-500/15 text-sky-600 dark:text-sky-300 border-sky-500/25">
+                  爆速応答
+                </span>
+                
+              </div>
+            </div>
+            <button type="button" class="shrink-0 min-h-[38px] px-3 rounded-xl text-xs font-semibold transition active:scale-95 bg-indigo-600 hover:bg-indigo-500 text-white">
+              DL＆起動
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">360Mパラメータの超高速モデル。</p>
+        </div></div>
+        </section>
+
+        <section class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+              </svg>
+              保存済みオフラインモデル
+            </h2>
+            <button id="btnRefreshCache" type="button" class="text-[11px] font-medium text-indigo-500 hover:text-indigo-400 py-1 px-2">
+              再読込
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">
+            一度DLしたモデルはiPad内に保存され、機内モードでも即時起動可能です。
+          </p>
+          <div id="cachedModelsList" class="space-y-2">
+          <div class="p-4 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
+            保存済みのモデルはありません。
+          </div>
+        </div>
+        </section>
+      </div>
+
+      <!-- パネル2: メモリ保護・推論設定 -->
+      <div id="panelSettings" class="hidden flex-1 overflow-y-auto p-3.5 space-y-4 safe-pb">
+        <section class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3.5">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100">iPad Safari クラッシュ防止エンジン</h3>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="selectCtxSize" class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                コンテキスト長 (n_ctx)
+              </label>
+              <span class="text-[11px] text-indigo-500 font-mono" id="ctxBadgeLabel">1024 tokens</span>
+            </div>
+            <select id="selectCtxSize" class="w-full min-h-[44px] px-3 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="512">512 (超省メモリ・無印iPad最安定)</option>
+              <option value="1024" selected="">1024 (標準・iPad推奨バランス)</option>
+              <option value="2048">2048 (長文向け・MチップiPad推奨)</option>
+            </select>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 dark:border-slate-700/80 flex items-start justify-between gap-3">
+            <div class="space-y-0.5">
+              <div class="text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                <span>WebGPU アクセラレーション</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-300 font-semibold">Mチップ向け</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                通常はOFF（CPU WASM実行）が最も安定します。
+              </p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+              <input id="toggleWebGPU" type="checkbox" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+        </section>
+
+        <section class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-3.5">
+          <h3 class="text-xs font-bold text-slate-800 dark:text-slate-100">応答生成パラメータ (日本語最適化)</h3>
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <label for="rangeTemp" class="font-medium text-slate-700 dark:text-slate-200">Temperature (創造性・低いほど賢く論理的)</label>
+              <span id="valTemp" class="font-mono text-indigo-500 font-semibold">0.3</span>
+            </div>
+            <input id="rangeTemp" type="range" min="0.0" max="1.5" step="0.1" value="0.3" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+          </div>
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <label for="rangeMaxTokens" class="font-medium text-slate-700 dark:text-slate-200">最大生成トークン数</label>
+              <span id="valMaxTokens" class="font-mono text-indigo-500 font-semibold">384</span>
+            </div>
+            <input id="rangeMaxTokens" type="range" min="64" max="1024" step="64" value="384" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+          </div>
+        </section>
+
+        <section class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <label for="systemPromptInput" class="text-xs font-bold text-slate-800 dark:text-slate-100">システムプロンプト (日本語厳格化)</label>
+            <button id="btnResetSystemPrompt" type="button" class="text-[11px] text-indigo-500 hover:underline">初期値に戻す</button>
+          </div>
+          <textarea id="systemPromptInput" rows="3" class="w-full p-2.5 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed">あなたはiPad上で完全オフライン動作する極めて優秀な日本語AIアシスタントです。回答は必ず自然で正確な日本語のみを使用し、英語を混ぜたり不自然な直訳をしないでください。論理的かつ簡潔に答えてください。</textarea>
+        </section>
+      </div>
+    </aside>
+
+    <!-- 右カラム: チャット画面 -->
+    <main class="flex-1 min-w-0 flex flex-col bg-slate-50 dark:bg-slate-950 relative">
+      <div class="shrink-0 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xs border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-5 py-2 flex items-center justify-between gap-3">
+        <div class="flex-1 max-w-md flex items-center gap-2.5 min-w-0">
+          <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 shrink-0">コンテキスト</span>
+          <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="contextMeterFill" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 14%;"></div>
+          </div>
+          <span id="contextMeterText" class="text-[11px] font-mono text-slate-600 dark:text-slate-300 shrink-0">~142 / 1024</span>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="speedBadge" class="hidden sm:inline-flex items-center px-2 py-1 rounded-lg text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            0.0 tok/s
+          </span>
+          <button id="btnNewChat" type="button" class="min-h-[36px] px-3 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition active:scale-95">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>新規チャット</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="chatMessagesContainer" class="flex-1 overflow-y-auto px-3 sm:px-6 py-4 space-y-4">
+        <div id="welcomeCard" class="max-w-2xl mx-auto my-4 sm:my-8 p-5 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-500 flex items-center justify-center shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">iPadで落ちない完全オフラインAI Studio</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">@wllama v4 安定エンジン搭載</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/75 border border-slate-200/70 dark:border-slate-700/70 space-y-1">
+              <div class="font-bold text-indigo-500">1. モデルを自由取得</div>
+              <p class="text-slate-600 dark:text-slate-300 leading-relaxed">Hugging Face等のGGUFリンクを貼り付けて直接ダウンロード。</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/75 border border-slate-200/70 dark:border-slate-700/70 space-y-1">
+              <div class="font-bold text-emerald-500">2. 完全オフライン保存</div>
+              <p class="text-slate-600 dark:text-slate-300 leading-relaxed">DLしたモデルはブラウザ内にキャッシュされ機内モードでも即起動。</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/75 border border-slate-200/70 dark:border-slate-700/70 space-y-1">
+              <div class="font-bold text-amber-500">3. クラッシュ徹底防止</div>
+              <p class="text-slate-600 dark:text-slate-300 leading-relaxed">GPU落ち回避と自動履歴トリミングで安全動作。</p>
+            </div>
+          </div>
+          <div class="pt-1 flex flex-wrap items-center gap-2">
+            <button id="btnQuickStartQwen" type="button" class="min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 flex items-center gap-2 transition active:scale-98">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <span>おすすめ日本語モデル (Qwen2.5-0.5B · 約400MB) をDLして始める</span>
+            </button>
+            <button id="btnOpenDrawerFromWelcome" type="button" class="md:hidden min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition">
+              モデル一覧を開く
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="safe-pb safe-pl safe-pr shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-3 sm:px-5">
+        <div class="max-w-3xl mx-auto">
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-2 no-select">
+            <button type="button" data-prompt="以下の文章を3行で分かりやすく要約してください：\n" class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 hover:text-indigo-500 text-slate-600 dark:text-slate-300 transition">
+              📝 3行要約
+            </button>
+            <button type="button" data-prompt="次の日本語を自然なビジネス英語に翻訳してください：\n" class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 hover:text-indigo-500 text-slate-600 dark:text-slate-300 transition">
+              🌐 日英翻訳
+            </button>
+            <button type="button" data-prompt="オフライン環境で作業効率を上げるアイデアを5つ箇条書きで提案してください。" class="shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 hover:text-indigo-500 text-slate-600 dark:text-slate-300 transition">
+              💡 アイデア出し
+            </button>
+          </div>
+
+          <form id="chatForm" class="flex items-end gap-2">
+            <div class="flex-1 relative">
+              <textarea id="chatInput" rows="1" placeholder="モデルを読み込んでメッセージを入力..." class="w-full min-h-[46px] max-h-[140px] px-3.5 py-3 rounded-2xl text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100 placeholder-slate-400 resize-none leading-snug"></textarea>
+            </div>
+            <button id="btnSend" type="submit" disabled="" class="min-w-[46px] min-h-[46px] px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white disabled:text-slate-500 font-semibold text-sm flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"></path>
+              </svg>
+              <span class="hidden sm:inline">送信</span>
+            </button>
+            <button id="btnStop" type="button" class="hidden min-w-[46px] min-h-[46px] px-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-sm items-center justify-center gap-1.5 shadow-sm transition active:scale-95 shrink-0">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+              </svg>
+              <span>停止</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- モーダル各種 -->
+  <div id="largeModelModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs">
+    <div class="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xl space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">iPadメモリ上限の警告 (1.1GB超)</h3>
+          <p id="largeModelModalDesc" class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+            選択されたモデルはファイルサイズが大きいため、iPadOS Safariのタブメモリ上限に達し、強制終了する恐れがあります。
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button id="btnCancelLargeModel" type="button" class="min-h-[44px] px-4 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+          中止する
+        </button>
+        <button id="btnProceedLargeModel" type="button" class="min-h-[44px] px-4 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white">
+          続行する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="guideModal" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs hidden">
+    <div class="w-full max-w-lg max-h-[88dvh] flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="text-indigo-500">📱</span> iPadで落ちずに完全オフライン運用するコツ
+        </h3>
+        <button id="btnCloseGuide" type="button" class="min-w-[40px] min-h-[40px] rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 space-y-2.5">
+          <h4 class="font-bold text-indigo-600 dark:text-indigo-300 text-sm">1. Safari用HTMLリンク（Data URL）をコピーして開く</h4>
+          <p>「ファイル」アプリからSafariで開けない場合は、下のボタンでアプリ全体を1本のHTMLリンク（<code>data:text/html...</code>）としてコピーし、<strong>Safariのアドレスバーに貼り付けて開いてください</strong>。開いた後、共有ボタンから「ホーム画面に追加」ができます。</p>
+          <button id="btnCopyDataUrl" type="button" class="w-full min-h-[44px] px-4 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm flex items-center justify-center gap-2 transition active:scale-98">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            <span>Safari用HTMLリンクをコピーする</span>
+          </button>
+          <textarea id="dataUrlPreviewBox" readonly="" rows="2" placeholder="上のボタンを押すとここに data:text/html;charset=utf-8,... のリンクが生成されます" class="w-full p-2 rounded-xl text-[10px] font-mono bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 focus:outline-none select-all"></textarea>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 space-y-1.5">
+          <h4 class="font-bold text-slate-900 dark:text-white text-sm">2. 安定動作のモデルサイズ</h4>
+          <p>無印iPadや古い機種では 1GB 未満（Qwen2.5-0.5BやSmolLM2-360Mなど）のモデルを推奨します。</p>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+        <button id="btnConfirmGuide" type="button" class="min-h-[44px] px-5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">
+          了解しました
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs">
+    <div class="w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-2xl space-y-4">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">キャッシュ削除</h3>
+      <p id="deleteConfirmText" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">このモデルを削除しますか？</p>
+      <div class="flex justify-end gap-2">
+        <button id="btnCancelDelete" type="button" class="min-h-[42px] px-4 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">キャンセル</button>
+        <button id="btnExecuteDelete" type="button" class="min-h-[42px] px-4 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none w-[92vw] max-w-md"></div>
+
+  <!-- メインJS -->
+  <script type="module">
+    const WLLAMA_CDN_BASE = 'https://cdn.jsdelivr.net/npm/@wllama/wllama@4.0.0/esm';
+    const WASM_PATH_CONFIG = {
+      'default': `${WLLAMA_CDN_BASE}/single-thread/wllama.wasm`,
+      'single-thread/wllama.wasm': `${WLLAMA_CDN_BASE}/single-thread/wllama.wasm`,
+      'multi-thread/wllama.wasm': `${WLLAMA_CDN_BASE}/multi-thread/wllama.wasm`,
+    };
+
+    const SAFE_MEMORY_LIMIT_BYTES = 1.1 * 1024 * 1024 * 1024;
+    const STORAGE_META_KEY = 'ipad_offline_ai_cached_models_v5';
+    const DEFAULT_SYSTEM_PROMPT = 'あなたはiPad上で完全オフライン動作する極めて優秀な日本語AIアシスタントです。回答は必ず自然で正確な日本語のみを使用し、英語を混ぜたり不自然な直訳をしないでください。論理的かつ簡潔に答えてください。';
+
+    let WllamaClass = null;
+    async function getWllamaClass() {
+      if (WllamaClass) return WllamaClass;
+      try {
+        const mod = await import(`${WLLAMA_CDN_BASE}/index.js`);
+        WllamaClass = mod.Wllama;
+        return WllamaClass;
+      } catch {
+        const fallback = await import('https://cdn.jsdelivr.net/npm/@wllama/wllama@4.0.0/+esm');
+        WllamaClass = fallback.Wllama;
+        return WllamaClass;
+      }
+    }
+
+    const CURATED_PRESETS = [
+      {
+        id: 'qwen25-15b',
+        name: 'Qwen2.5-1.5B-Instruct',
+        quant: 'Q4_K_M',
+        sizeLabel: '約986MB',
+        sizeBytes: 1034000000,
+        badge: '日本語トップクラスの賢さ',
+        badgeColor: 'amber',
+        desc: '1GBギリギリですが、日本語の理解力・文章作成能力が頭一つ抜けて高い推奨モデル。',
+        url: 'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf'
+      },
+      {
+        id: 'qwen25-05b',
+        name: 'Qwen2.5-0.5B-Instruct',
+        quant: 'Q4_K_M',
+        sizeLabel: '約400MB',
+        sizeBytes: 418000000,
+        badge: '超軽量・安定動作',
+        badgeColor: 'emerald',
+        desc: '無印iPadでも絶対に落ちない超軽量モデル。気軽な会話や要約に最適。',
+        url: 'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf'
+      },
+      {
+        id: 'llama32-1b',
+        name: 'Llama-3.2-1B-Instruct',
+        quant: 'Q4_K_M',
+        sizeLabel: '約808MB',
+        sizeBytes: 847000000,
+        badge: 'Meta製バランス1B',
+        badgeColor: 'indigo',
+        desc: 'Meta製の安定した1Bモデル。構造化された返答が得意。',
+        url: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf'
+      },
+      {
+        id: 'smollm2-360m',
+        name: 'SmolLM2-360M-Instruct',
+        quant: 'Q8_0',
+        sizeLabel: '約386MB',
+        sizeBytes: 405000000,
+        badge: '爆速応答',
+        badgeColor: 'sky',
+        desc: '360Mパラメータの超高速モデル。',
+        url: 'https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct-GGUF/resolve/main/smollm2-360m-instruct-q8_0.gguf'
+      }
+    ];
+
+    const state = {
+      wllama: null,
+      isModelLoaded: false,
+      activeModelName: '',
+      activeModelUrl: '',
+      isDownloadingOrLoading: false,
+      isGenerating: false,
+      downloadAbortController: null,
+      generationAbortController: null,
+      messages: [],
+      pendingLargeModelAction: null,
+      pendingDeleteTarget: null
+    };
+
+    const el = {
+      networkBadge: document.getElementById('networkBadge'),
+      networkDot: document.getElementById('networkDot'),
+      networkText: document.getElementById('networkText'),
+      networkTextShort: document.getElementById('networkTextShort'),
+      activeModelSubtitle: document.getElementById('activeModelSubtitle'),
+      btnUnloadModel: document.getElementById('btnUnloadModel'),
+      btnOpenGuide: document.getElementById('btnOpenGuide'),
+      btnExportHtml: document.getElementById('btnExportHtml'),
+      btnThemeToggle: document.getElementById('btnThemeToggle'),
+      sidebarDrawer: document.getElementById('sidebarDrawer'),
+      sidebarBackdrop: document.getElementById('sidebarBackdrop'),
+      btnToggleSidebar: document.getElementById('btnToggleSidebar'),
+      btnCloseSidebar: document.getElementById('btnCloseSidebar'),
+      tabModels: document.getElementById('tabModels'),
+      tabSettings: document.getElementById('tabSettings'),
+      panelModels: document.getElementById('panelModels'),
+      panelSettings: document.getElementById('panelSettings'),
+      downloadProgressCard: document.getElementById('downloadProgressCard'),
+      progressPhaseLabel: document.getElementById('progressPhaseLabel'),
+      progressModelName: document.getElementById('progressModelName'),
+      progressBarFill: document.getElementById('progressBarFill'),
+      progressBytesText: document.getElementById('progressBytesText'),
+      progressPercentText: document.getElementById('progressPercentText'),
+      btnCancelDownload: document.getElementById('btnCancelDownload'),
+      customUrlInput: document.getElementById('customUrlInput'),
+      btnDownloadCustomUrl: document.getElementById('btnDownloadCustomUrl'),
+      localFileInput: document.getElementById('localFileInput'),
+      presetList: document.getElementById('presetList'),
+      cachedModelsList: document.getElementById('cachedModelsList'),
+      btnRefreshCache: document.getElementById('btnRefreshCache'),
+      selectCtxSize: document.getElementById('selectCtxSize'),
+      ctxBadgeLabel: document.getElementById('ctxBadgeLabel'),
+      toggleWebGPU: document.getElementById('toggleWebGPU'),
+      rangeTemp: document.getElementById('rangeTemp'),
+      valTemp: document.getElementById('valTemp'),
+      rangeMaxTokens: document.getElementById('rangeMaxTokens'),
+      valMaxTokens: document.getElementById('valMaxTokens'),
+      systemPromptInput: document.getElementById('systemPromptInput'),
+      btnResetSystemPrompt: document.getElementById('btnResetSystemPrompt'),
+      contextMeterFill: document.getElementById('contextMeterFill'),
+      contextMeterText: document.getElementById('contextMeterText'),
+      speedBadge: document.getElementById('speedBadge'),
+      btnNewChat: document.getElementById('btnNewChat'),
+      chatMessagesContainer: document.getElementById('chatMessagesContainer'),
+      welcomeCard: document.getElementById('welcomeCard'),
+      btnQuickStartQwen: document.getElementById('btnQuickStartQwen'),
+      btnOpenDrawerFromWelcome: document.getElementById('btnOpenDrawerFromWelcome'),
+      chatForm: document.getElementById('chatForm'),
+      chatInput: document.getElementById('chatInput'),
+      btnSend: document.getElementById('btnSend'),
+      btnStop: document.getElementById('btnStop'),
+      largeModelModal: document.getElementById('largeModelModal'),
+      largeModelModalDesc: document.getElementById('largeModelModalDesc'),
+      btnCancelLargeModel: document.getElementById('btnCancelLargeModel'),
+      btnProceedLargeModel: document.getElementById('btnProceedLargeModel'),
+      guideModal: document.getElementById('guideModal'),
+      btnCloseGuide: document.getElementById('btnCloseGuide'),
+      btnConfirmGuide: document.getElementById('btnConfirmGuide'),
+      btnCopyDataUrl: document.getElementById('btnCopyDataUrl'),
+      dataUrlPreviewBox: document.getElementById('dataUrlPreviewBox'),
+      deleteConfirmModal: document.getElementById('deleteConfirmModal'),
+      deleteConfirmText: document.getElementById('deleteConfirmText'),
+      btnCancelDelete: document.getElementById('btnCancelDelete'),
+      btnExecuteDelete: document.getElementById('btnExecuteDelete'),
+      toastContainer: document.getElementById('toastContainer')
+    };
+
+    function showToast(message, type = 'info') {
+      const colors = {
+        info: 'bg-slate-800 text-white border-slate-700',
+        success: 'bg-emerald-600 text-white border-emerald-500',
+        warning: 'bg-amber-600 text-white border-amber-500',
+        error: 'bg-rose-600 text-white border-rose-500'
+      };
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto px-4 py-2.5 rounded-2xl text-xs font-semibold border shadow-xl transition-all duration-300 transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.textContent = message;
+      el.toastContainer.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes <= 0) return 'サイズ不明';
+      const mb = bytes / (1024 * 1024);
+      return mb >= 1024 ? `${(mb / 1024).toFixed(2)} GB` : `${mb.toFixed(1)} MB`;
+    }
+
+    function normalizeModelUrl(rawUrl) {
+      let cleaned = rawUrl.trim();
+      if (!cleaned) return '';
+      if (cleaned.includes('huggingface.co/') && cleaned.includes('/blob/')) {
+        cleaned = cleaned.replace('/blob/', '/resolve/');
+      }
+      return cleaned;
+    }
+
+    function extractModelNameFromUrl(url) {
+      try {
+        const u = new URL(url);
+        const parts = u.pathname.split('/').filter(Boolean);
+        return decodeURIComponent(parts[parts.length - 1] || 'custom-model.gguf');
+      } catch {
+        return 'custom-model.gguf';
+      }
+    }
+
+    function updateNetworkStatus() {
+      const online = navigator.onLine;
+      if (online) {
+        el.networkBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25';
+        el.networkDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+        el.networkText.textContent = 'オンライン (モデルDL可能)';
+        el.networkTextShort.textContent = 'オンライン';
+      } else {
+        el.networkBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-500/30';
+        el.networkDot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        el.networkText.textContent = 'オフライン (完全ローカル動作中)';
+        el.networkTextShort.textContent = 'オフライン動作';
+      }
+    }
+
+    async function safelyUnloadCurrentModel(silent = false) {
+      if (state.generationAbortController) {
+        state.generationAbortController.abort();
+        state.generationAbortController = null;
+      }
+      if (state.wllama) {
+        try {
+          await state.wllama.exit();
+        } catch (e) {
+          console.warn('Exit warning:', e);
+        }
+      }
+      state.wllama = null;
+      state.isModelLoaded = false;
+      state.activeModelName = '';
+      state.activeModelUrl = '';
+      updateModelStatusUI();
+      await new Promise((r) => setTimeout(r, 100));
+      if (!silent) showToast('メモリを解放しました', 'success');
+    }
+
+    function updateModelStatusUI() {
+      if (state.isModelLoaded) {
+        const backendTag = el.toggleWebGPU.checked ? 'WebGPU' : 'CPU WASM';
+        el.activeModelSubtitle.textContent = `読込済: ${state.activeModelName} (${backendTag})`;
+        el.activeModelSubtitle.className = 'text-xs font-medium text-emerald-600 dark:text-emerald-400 truncate';
+        el.btnUnloadModel.disabled = false;
+        el.btnSend.disabled = false;
+        el.chatInput.placeholder = `${state.activeModelName} にメッセージを送信...`;
+      } else {
+        el.activeModelSubtitle.textContent = 'モデル未読込（左メニューから選択またはURL入力）';
+        el.activeModelSubtitle.className = 'text-xs text-slate-500 dark:text-slate-400 truncate';
+        el.btnUnloadModel.disabled = true;
+        el.btnSend.disabled = true;
+        el.chatInput.placeholder = 'モデルを読み込んでメッセージを入力...';
+      }
+      renderPresets();
+      renderCachedModelsList();
+    }
+
+    function getSavedModelMetadata() {
+      try {
+        const raw = localStorage.getItem(STORAGE_META_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveModelMetadataEntry(entry) {
+      const list = getSavedModelMetadata();
+      const idx = list.findIndex((item) => item.url === entry.url);
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...entry, updatedAt: Date.now() };
+      } else {
+        list.unshift({ ...entry, downloadedAt: Date.now(), updatedAt: Date.now() });
+      }
+      try {
+        localStorage.setItem(STORAGE_META_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.warn('Storage save error:', e);
+      }
+    }
+
+    function removeModelMetadataEntry(url) {
+      const list = getSavedModelMetadata().filter((item) => item.url !== url);
+      try {
+        localStorage.setItem(STORAGE_META_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    async function discoverAllCachedModels() {
+      const metaList = getSavedModelMetadata();
+      const discoveredMap = new Map();
+      for (const m of metaList) {
+        discoveredMap.set(m.url, { ...m });
+      }
+      try {
+        if (state.wllama && state.wllama.cacheManager && typeof state.wllama.cacheManager.list === 'function') {
+          const cachedFiles = await state.wllama.cacheManager.list();
+          for (const fileName of cachedFiles) {
+            for (const [, item] of discoveredMap.entries()) {
+              if (item.name === fileName || item.url.includes(fileName)) {
+                item.inCacheManager = true;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+      return Array.from(discoveredMap.values());
+    }
+
+    async function deleteModelFromCache(targetItem) {
+      try {
+        if (state.activeModelUrl === targetItem.url) {
+          await safelyUnloadCurrentModel(true);
+        }
+        if (state.wllama && state.wllama.cacheManager) {
+          await state.wllama.cacheManager.delete(targetItem.url).catch(() => {});
+          await state.wllama.cacheManager.delete(targetItem.name).catch(() => {});
+        }
+        removeModelMetadataEntry(targetItem.url);
+        await renderCachedModelsList();
+        renderPresets();
+        showToast(`「${targetItem.name}」を削除しました`, 'success');
+      } catch (err) {
+        showToast('削除に失敗しました', 'error');
+      }
+    }
+
+    function setProgressUI(visible, phaseLabel = '', modelName = '', loaded = 0, total = 0) {
+      if (!visible) {
+        el.downloadProgressCard.classList.add('hidden');
+        el.progressBarFill.style.width = '0%';
+        return;
+      }
+      el.downloadProgressCard.classList.remove('hidden');
+      el.progressPhaseLabel.textContent = phaseLabel;
+      el.progressModelName.textContent = modelName;
+      if (total > 0) {
+        const pct = Math.min(100, Math.max(0, Math.round((loaded / total) * 100)));
+        el.progressBarFill.style.width = `${pct}%`;
+        el.progressBytesText.textContent = `${formatBytes(loaded)} / ${formatBytes(total)}`;
+        el.progressPercentText.textContent = `${pct}%`;
+      } else {
+        el.progressBarFill.style.width = loaded > 0 ? '50%' : '15%';
+        el.progressBytesText.textContent = loaded > 0 ? `${formatBytes(loaded)} 受信中...` : '接続中...';
+        el.progressPercentText.textContent = '...';
+      }
+    }
+
+    function confirmLargeModelIfNeeded(sizeBytes, modelName, onProceed) {
+      if (sizeBytes && sizeBytes > SAFE_MEMORY_LIMIT_BYTES) {
+        el.largeModelModalDesc.textContent = `「${modelName}」（${formatBytes(sizeBytes)}）は 1.1GB を超えています。iPadOS Safariのタブメモリ上限により強制終了するリスクがあります。`;
+        state.pendingLargeModelAction = onProceed;
+        el.largeModelModal.classList.remove('hidden');
+        el.largeModelModal.classList.add('flex');
+      } else {
+        onProceed();
+      }
+    }
+
+    // 公式ロードパイプライン（loadModelFromUrl を使用してメモリ＆キャッシュエラーを完全回避）
+    async function executeModelLoad(url, modelName, knownSizeBytes) {
+      state.isDownloadingOrLoading = true;
+      const abortController = new AbortController();
+      state.downloadAbortController = abortController;
+
+      try {
+        if (state.isModelLoaded) {
+          await safelyUnloadCurrentModel(true);
+        }
+
+        setProgressUI(true, 'AI推論エンジンを初期化中...', modelName, 0, knownSizeBytes);
+        const Wllama = await getWllamaClass();
+        state.wllama = new Wllama(WASM_PATH_CONFIG, { allowOffline: true, suppressNativeLog: true });
+
+        // 【重要】iPad/SafariのMemory64クラッシュを防ぐためcompatモードを強制適用
+        try {
+          if (typeof state.wllama.setCompat === 'function') {
+            state.wllama.setCompat('default', 'firefox_safari');
+          }
+        } catch (e) {}
+
+        if (el.toggleWebGPU.checked && typeof state.wllama.setCompat === 'function') {
+          try { state.wllama.setCompat('default', 'firefox_safari'); } catch (e) {}
+        }
+
+        const nCtx = parseInt(el.selectCtxSize.value, 10) || 512; // Safari保護のため初期値を安全側に
+        const nGpuLayers = el.toggleWebGPU.checked ? 99 : 0;
+        const nThreads = window.crossOriginIsolated ? undefined : 1;
+
+        setProgressUI(true, 'モデルをダウンロード・読込中...', modelName, 0, knownSizeBytes);
+
+        let finalSize = knownSizeBytes;
+        await state.wllama.loadModelFromUrl(url, {
+          n_ctx: nCtx,
+          n_gpu_layers: nGpuLayers,
+          n_threads: nThreads,
+          abortSignal: abortController.signal,
+          progressCallback: ({ loaded, total }) => {
+            if (total) finalSize = total;
+            setProgressUI(true, 'ダウンロード＆WASM展開中...', modelName, loaded, finalSize);
+          }
+        });
+
+        state.isModelLoaded = true;
+        state.activeModelName = modelName;
+        state.activeModelUrl = url;
+
+        saveModelMetadataEntry({ url, name: modelName, sizeBytes: finalSize });
+
+        setProgressUI(false);
+        updateModelStatusUI();
+        closeSidebarOnMobile();
+        showToast(`「${modelName}」の準備が完了しました！`, 'success');
+      } catch (err) {
+        setProgressUI(false);
+        if (err?.name === 'AbortError' || abortController.signal.aborted) {
+          showToast('ダウンロードを中止しました', 'warning');
+        } else {
+          console.error('Model load error:', err);
+          showToast(`読込エラー: ${err?.message || err}`, 'error');
+        }
+        await safelyUnloadCurrentModel(true);
+      } finally {
+        state.isDownloadingOrLoading = false;
+        state.downloadAbortController = null;
+      }
+    }
+
+    async function downloadAndLoadFromUrl(rawUrl, customName = '', knownSizeBytes = 0) {
+      const url = normalizeModelUrl(rawUrl);
+      if (!url) {
+        showToast('有効なGGUFモデルのURLを入力してください', 'warning');
+        return;
+      }
+      if (state.isDownloadingOrLoading) {
+        showToast('現在別のモデルを処理中です', 'warning');
+        return;
+      }
+      const modelName = customName || extractModelNameFromUrl(url);
+      confirmLargeModelIfNeeded(knownSizeBytes, modelName, () => {
+        executeModelLoad(url, modelName, knownSizeBytes);
+      });
+    }
+
+    async function loadLocalGgufFile(file) {
+      if (!file) return;
+      if (state.isDownloadingOrLoading) return;
+
+      confirmLargeModelIfNeeded(file.size, file.name, async () => {
+        state.isDownloadingOrLoading = true;
+        try {
+          if (state.isModelLoaded) await safelyUnloadCurrentModel(true);
+
+          setProgressUI(true, 'ローカルファイルを読込中...', file.name, 0, file.size);
+          const Wllama = await getWllamaClass();
+          state.wllama = new Wllama(WASM_PATH_CONFIG, { allowOffline: true, suppressNativeLog: true });
+
+          const nCtx = parseInt(el.selectCtxSize.value, 10) || 1024;
+          const nGpuLayers = el.toggleWebGPU.checked ? 99 : 0;
+          const nThreads = window.crossOriginIsolated ? undefined : 1;
+
+          await state.wllama.loadModel([file], {
+            n_ctx: nCtx,
+            n_gpu_layers: nGpuLayers,
+            n_threads: nThreads,
+            progressCallback: ({ loaded, total }) => {
+              setProgressUI(true, 'ローカルメモリへ展開中...', file.name, loaded, total || file.size);
+            }
+          });
+
+          state.isModelLoaded = true;
+          state.activeModelName = file.name;
+          state.activeModelUrl = `local://${file.name}`;
+
+          setProgressUI(false);
+          updateModelStatusUI();
+          closeSidebarOnMobile();
+          showToast(`ローカルファイル「${file.name}」を読み込みました`, 'success');
+        } catch (err) {
+          setProgressUI(false);
+          showToast(`ローカル読込エラー: ${err?.message || err}`, 'error');
+          await safelyUnloadCurrentModel(true);
+        } finally {
+          state.isDownloadingOrLoading = false;
+          el.localFileInput.value = '';
+        }
+      });
+    }
+
+    function renderPresets() {
+      const savedMeta = getSavedModelMetadata();
+      const cachedUrls = new Set(savedMeta.map((m) => m.url));
+
+      const badgeStyles = {
+        emerald: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/25',
+        sky: 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border-sky-500/25',
+        indigo: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 border-indigo-500/25',
+        amber: 'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/25'
+      };
+
+      el.presetList.innerHTML = '';
+      for (const preset of CURATED_PRESETS) {
+        const isCached = cachedUrls.has(preset.url);
+        const isActive = state.isModelLoaded && state.activeModelUrl === preset.url;
+
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border transition ${
+          isActive
+            ? 'bg-indigo-500/10 border-indigo-500/50'
+            : 'bg-white dark:bg-slate-800/50 border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400/50'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-slate-900 dark:text-white truncate">${preset.name}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">${preset.quant} · ${preset.sizeLabel}</span>
+              </div>
+              <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badgeStyles[preset.badgeColor]}">
+                  ${preset.badge}
+                </span>
+                ${isCached ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-500/15 text-violet-600 dark:text-violet-300">保存済</span>' : ''}
+              </div>
+            </div>
+            <button type="button"
+              class="shrink-0 min-h-[38px] px-3 rounded-xl text-xs font-semibold transition active:scale-95 ${
+                isActive
+                  ? 'bg-emerald-600 text-white cursor-default'
+                  : isCached
+                    ? 'bg-violet-600 hover:bg-violet-500 text-white'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+              }">
+              ${isActive ? '使用中' : isCached ? 'オフライン起動' : 'DL＆起動'}
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">${preset.desc}</p>
+        `;
+
+        const btn = card.querySelector('button');
+        if (!isActive) {
+          btn.addEventListener('click', () => {
+            downloadAndLoadFromUrl(preset.url, `${preset.name} (${preset.quant})`, preset.sizeBytes);
+          });
+        }
+        el.presetList.appendChild(card);
+      }
+    }
+
+    async function renderCachedModelsList() {
+      const models = await discoverAllCachedModels();
+      el.cachedModelsList.innerHTML = '';
+      if (models.length === 0) {
+        el.cachedModelsList.innerHTML = `
+          <div class="p-4 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400">
+            保存済みのモデルはありません。
+          </div>
+        `;
+        return;
+      }
+      for (const item of models) {
+        const isActive = state.isModelLoaded && state.activeModelUrl === item.url;
+        const row = document.createElement('div');
+        row.className = `p-3 rounded-2xl border flex items-center justify-between gap-2 ${
+          isActive ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80'
+        }`;
+        row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold text-slate-900 dark:text-white truncate">${item.name}</div>
+            <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">${formatBytes(item.sizeBytes)} · キャッシュ済</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" data-action="load" class="min-h-[38px] px-3 rounded-xl text-xs font-semibold ${isActive ? 'bg-emerald-600 text-white cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white'}">${isActive ? '読込済' : '切替'}</button>
+            <button type="button" data-action="delete" class="min-w-[38px] min-h-[38px] rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        `;
+        const loadBtn = row.querySelector('[data-action="load"]');
+        if (!isActive) {
+          loadBtn.addEventListener('click', () => downloadAndLoadFromUrl(item.url, item.name, item.sizeBytes));
+        }
+        const delBtn = row.querySelector('[data-action="delete"]');
+        delBtn.addEventListener('click', () => {
+          state.pendingDeleteTarget = item;
+          el.deleteConfirmText.textContent = `「${item.name}」をキャッシュから削除しますか？`;
+          el.deleteConfirmModal.classList.remove('hidden');
+          el.deleteConfirmModal.classList.add('flex');
+        });
+        el.cachedModelsList.appendChild(row);
+      }
+    }
+
+    function estimateTokens(text) {
+      if (!text) return 0;
+      let tokens = 0;
+      for (let i = 0; i < text.length; i++) {
+        tokens += text.charCodeAt(i) > 0x2e80 ? 1.4 : 0.35;
+      }
+      return Math.ceil(tokens) + 6;
+    }
+
+    function buildSlidingWindowMessages() {
+      const nCtx = parseInt(el.selectCtxSize.value, 10) || 1024;
+      const maxGenTokens = parseInt(el.rangeMaxTokens.value, 10) || 384;
+      const maxPromptTokens = Math.max(256, nCtx - Math.min(maxGenTokens, Math.floor(nCtx * 0.45)) - 32);
+
+      const sysText = el.systemPromptInput.value.trim();
+      const systemMsg = sysText ? [{ role: 'system', content: sysText }] : [];
+      let usedTokens = sysText ? estimateTokens(sysText) : 0;
+
+      const keptReversed = [];
+      for (let i = state.messages.length - 1; i >= 0; i--) {
+        const msg = state.messages[i];
+        const msgTokens = estimateTokens(msg.content);
+        if (usedTokens + msgTokens > maxPromptTokens && keptReversed.length > 0) break;
+        keptReversed.push(msg);
+        usedTokens += msgTokens;
+      }
+
+      const finalMessages = [...systemMsg, ...keptReversed.reverse()];
+      updateContextMeter(usedTokens, nCtx);
+      return finalMessages;
+    }
+
+    function updateContextMeter(usedTokens, nCtx) {
+      const pct = Math.min(100, Math.round((usedTokens / nCtx) * 100));
+      el.contextMeterFill.style.width = `${Math.max(3, pct)}%`;
+      el.contextMeterText.textContent = `~${usedTokens} / ${nCtx}`;
+    }
+
+    function appendMessageBubble(role, content, isStreaming = false) {
+      if (el.welcomeCard) el.welcomeCard.classList.add('hidden');
+      const wrapper = document.createElement('div');
+      wrapper.className = `max-w-3xl mx-auto flex gap-2.5 sm:gap-3 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+      if (role === 'assistant') {
+        wrapper.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 shadow-xs">AI</div>
+          <div class="min-w-0 max-w-[85%] sm:max-w-[80%] rounded-2xl rounded-tl-sm px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs text-sm text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-wrap break-words ${isStreaming ? 'streaming-cursor' : ''}"></div>
+        `;
+      } else {
+        wrapper.innerHTML = `<div class="min-w-0 max-w-[85%] sm:max-w-[78%] rounded-2xl rounded-tr-sm px-4 py-3 bg-indigo-600 text-white shadow-xs text-sm leading-relaxed whitespace-pre-wrap break-words"></div>`;
+      }
+      const bubble = wrapper.querySelector('div:last-child');
+      bubble.textContent = content;
+      el.chatMessagesContainer.appendChild(wrapper);
+      el.chatMessagesContainer.scrollTop = el.chatMessagesContainer.scrollHeight;
+      return bubble;
+    }
+
+    async function handleSendMessage(e) {
+      e.preventDefault();
+      if (state.isGenerating) return;
+      const text = el.chatInput.value.trim();
+      if (!text) return;
+      if (!state.isModelLoaded || !state.wllama) {
+        showToast('先にモデルを読み込んでください', 'warning');
+        return;
+      }
+
+      state.messages.push({ role: 'user', content: text });
+      appendMessageBubble('user', text, false);
+      el.chatInput.value = '';
+      el.chatInput.style.height = 'auto';
+
+      state.isGenerating = true;
+      el.btnSend.classList.add('hidden');
+      el.btnStop.classList.remove('hidden');
+      el.btnStop.classList.add('flex');
+
+      const abortController = new AbortController();
+      state.generationAbortController = abortController;
+
+      const assistantBubble = appendMessageBubble('assistant', '', true);
+      let fullResponse = '';
+      let tokenCount = 0;
+      const startTime = performance.now();
+
+      try {
+        const promptMessages = buildSlidingWindowMessages();
+        const stream = await state.wllama.createChatCompletion({
+          messages: promptMessages,
+          stream: true,
+          cache_prompt: true,
+          max_tokens: parseInt(el.rangeMaxTokens.value, 10),
+          temperature: parseFloat(el.rangeTemp.value),
+          top_p: 0.9,
+          repeat_penalty: 1.1,
+          abortSignal: abortController.signal
+        });
+
+        for await (const chunk of stream) {
+          const delta = chunk?.choices?.[0]?.delta?.content || chunk?.text || '';
+          if (delta) {
+            fullResponse += delta;
+            tokenCount++;
+            assistantBubble.textContent = fullResponse;
+            el.chatMessagesContainer.scrollTop = el.chatMessagesContainer.scrollHeight;
+            const elapsed = (performance.now() - startTime) / 1000;
+            if (elapsed > 0.2) el.speedBadge.textContent = `${(tokenCount / elapsed).toFixed(1)} tok/s`;
+          }
+        }
+      } catch (err) {
+        if (!fullResponse) fullResponse = '（停止しました）';
+      } finally {
+        assistantBubble.classList.remove('streaming-cursor');
+        state.messages.push({ role: 'assistant', content: fullResponse });
+        buildSlidingWindowMessages();
+        state.isGenerating = false;
+        state.generationAbortController = null;
+        el.btnStop.classList.add('hidden');
+        el.btnStop.classList.remove('flex');
+        el.btnSend.classList.remove('hidden');
+      }
+    }
+
+    function resetChatConversation() {
+      if (state.isGenerating && state.generationAbortController) state.generationAbortController.abort();
+      state.messages = [];
+      el.chatMessagesContainer.innerHTML = '';
+      if (el.welcomeCard) {
+        el.welcomeCard.classList.remove('hidden');
+        el.chatMessagesContainer.appendChild(el.welcomeCard);
+      }
+      buildSlidingWindowMessages();
+      showToast('会話をリセットしました', 'info');
+    }
+
+    function exportStandaloneHtml() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ipad-offline-ai.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showToast('HTMLファイルを保存しました', 'success');
+    }
+
+    function copyHtmlDataUrl() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent);
+      el.dataUrlPreviewBox.value = dataUrl;
+      el.dataUrlPreviewBox.focus();
+      el.dataUrlPreviewBox.select();
+      try {
+        document.execCommand('copy');
+        showToast('Safari用HTMLリンクをコピーしました！SafariのURL欄に貼り付けてください', 'success');
+      } catch (e) {
+        showToast('下の枠内のリンクを全選択してコピーしてください', 'warning');
+      }
+    }
+
+    function openSidebarOnMobile() {
+      el.sidebarDrawer.classList.remove('-translate-x-full');
+      el.sidebarBackdrop.classList.remove('hidden');
+    }
+    function closeSidebarOnMobile() {
+      el.sidebarDrawer.classList.add('-translate-x-full');
+      el.sidebarBackdrop.classList.add('hidden');
+    }
+
+    function bindEvents() {
+      window.addEventListener('online', updateNetworkStatus);
+      window.addEventListener('offline', updateNetworkStatus);
+
+      el.btnToggleSidebar.addEventListener('click', openSidebarOnMobile);
+      el.btnCloseSidebar.addEventListener('click', closeSidebarOnMobile);
+      el.sidebarBackdrop.addEventListener('click', closeSidebarOnMobile);
+      el.btnOpenDrawerFromWelcome.addEventListener('click', openSidebarOnMobile);
+
+      el.tabModels.addEventListener('click', () => {
+        el.panelModels.classList.remove('hidden');
+        el.panelSettings.classList.add('hidden');
+        el.tabModels.className = 'min-h-[38px] rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs transition';
+        el.tabSettings.className = 'min-h-[38px] rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition';
+      });
+
+      el.tabSettings.addEventListener('click', () => {
+        el.panelSettings.classList.remove('hidden');
+        el.panelModels.classList.add('hidden');
+        el.tabSettings.className = 'min-h-[38px] rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs transition';
+        el.tabModels.className = 'min-h-[38px] rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition';
+      });
+
+      el.btnDownloadCustomUrl.addEventListener('click', () => {
+        const url = el.customUrlInput.value.trim();
+        if (!url) {
+          showToast('URLを入力してください', 'warning');
+          return;
+        }
+        downloadAndLoadFromUrl(url);
+      });
+
+      el.localFileInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) loadLocalGgufFile(file);
+      });
+
+      el.btnQuickStartQwen.addEventListener('click', () => {
+        const qwen = CURATED_PRESETS[0];
+        downloadAndLoadFromUrl(qwen.url, `${qwen.name} (${qwen.quant})`, qwen.sizeBytes);
+      });
+
+      el.btnCancelDownload.addEventListener('click', () => {
+        if (state.downloadAbortController) state.downloadAbortController.abort();
+      });
+
+      el.btnRefreshCache.addEventListener('click', async () => {
+        await renderCachedModelsList();
+        showToast('一覧を更新しました', 'info');
+      });
+
+      el.btnUnloadModel.addEventListener('click', () => safelyUnloadCurrentModel(false));
+
+      el.selectCtxSize.addEventListener('change', () => {
+        el.ctxBadgeLabel.textContent = `${el.selectCtxSize.value} tokens`;
+        buildSlidingWindowMessages();
+      });
+
+      el.rangeTemp.addEventListener('input', () => {
+        el.valTemp.textContent = parseFloat(el.rangeTemp.value).toFixed(1);
+      });
+
+      el.rangeMaxTokens.addEventListener('input', () => {
+        el.valMaxTokens.textContent = el.rangeMaxTokens.value;
+      });
+
+      el.btnResetSystemPrompt.addEventListener('click', () => {
+        el.systemPromptInput.value = DEFAULT_SYSTEM_PROMPT;
+        buildSlidingWindowMessages();
+      });
+
+      el.chatForm.addEventListener('submit', handleSendMessage);
+      el.btnStop.addEventListener('click', () => {
+        if (state.generationAbortController) state.generationAbortController.abort();
+      });
+      el.btnNewChat.addEventListener('click', resetChatConversation);
+
+      el.chatInput.addEventListener('input', () => {
+        el.chatInput.style.height = 'auto';
+        el.chatInput.style.height = Math.min(140, el.chatInput.scrollHeight) + 'px';
+      });
+      el.chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+          e.preventDefault();
+          el.chatForm.requestSubmit();
+        }
+      });
+
+      document.querySelectorAll('[data-prompt]').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          el.chatInput.value = chip.getAttribute('data-prompt').replace(/\\n/g, '\n');
+          el.chatInput.focus();
+        });
+      });
+
+      el.btnCancelLargeModel.addEventListener('click', () => {
+        el.largeModelModal.classList.add('hidden');
+        el.largeModelModal.classList.remove('flex');
+      });
+      el.btnProceedLargeModel.addEventListener('click', () => {
+        el.largeModelModal.classList.add('hidden');
+        el.largeModelModal.classList.remove('flex');
+        const action = state.pendingLargeModelAction;
+        state.pendingLargeModelAction = null;
+        if (typeof action === 'function') action();
+      });
+
+      el.btnOpenGuide.addEventListener('click', () => { el.guideModal.classList.remove('hidden'); el.guideModal.classList.add('flex'); });
+      el.btnCloseGuide.addEventListener('click', () => { el.guideModal.classList.add('hidden'); el.guideModal.classList.remove('flex'); });
+      el.btnConfirmGuide.addEventListener('click', () => { el.guideModal.classList.add('hidden'); el.guideModal.classList.remove('flex'); });
+      el.btnCopyDataUrl.addEventListener('click', copyHtmlDataUrl);
+
+      el.btnCancelDelete.addEventListener('click', () => {
+        el.deleteConfirmModal.classList.add('hidden');
+        el.deleteConfirmModal.classList.remove('flex');
+      });
+      el.btnExecuteDelete.addEventListener('click', async () => {
+        el.deleteConfirmModal.classList.add('hidden');
+        el.deleteConfirmModal.classList.remove('flex');
+        const target = state.pendingDeleteTarget;
+        state.pendingDeleteTarget = null;
+        if (target) await deleteModelFromCache(target);
+      });
+
+      el.btnExportHtml.addEventListener('click', exportStandaloneHtml);
+      el.btnThemeToggle.addEventListener('click', () => document.documentElement.classList.toggle('dark'));
+    }
+
+    async function init() {
+      updateNetworkStatus();
+      bindEvents();
+      renderPresets();
+      await renderCachedModelsList();
+      buildSlidingWindowMessages();
+    }
+
+    init();
+  </script>
+
+</body></html>
